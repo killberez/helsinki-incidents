@@ -35,6 +35,7 @@ setInterval(() => {
       if (error) {
         return console.log(error);
       }
+      console.log(data);
       JSON.parse(data).forEach((chat) => {
         newIncidents.forEach((incident) => {
           bot.telegram.sendMessage(
