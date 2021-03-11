@@ -12,19 +12,26 @@ if (!incidents.length) {
 }
 
 const app = express();
-const chats = [];
 const bot = new Telegraf("1604583340:AAFlcX3igKzUROO8fOYbZOI8d7E7dbsKoYg");
 bot.launch();
 bot.hears("subscribe", (ctx) => {
-  chats.push(ctx.update.message.chat.id);
   bot.telegram.sendMessage(
     ctx.update.message.chat.id,
     "Subscribed. Chat Id: " + ctx.update.message.chat.id
   );
-  fs.writeFile("data.json", JSON.stringify(chats), (error) => {
+  fs.readFile("data.json", (error, data) => {
     if (error) {
       return console.log(error);
     }
+    fs.writeFile(
+      "data.json",
+      JSON.stringify(JSON.parse(data).concat(ctx.update.message.chat.id)),
+      (error) => {
+        if (error) {
+          return console.log(error);
+        }
+      }
+    );
   });
 });
 setInterval(() => {
@@ -39,7 +46,7 @@ setInterval(() => {
       if (error) {
         return console.log(error);
       }
-      console.log(data);
+      console.log(JSON.stringify(data));
       JSON.parse(data).forEach((chat) => {
         newIncidents.forEach((incident) => {
           bot.telegram.sendMessage(
